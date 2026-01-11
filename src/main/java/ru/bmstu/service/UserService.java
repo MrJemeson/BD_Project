@@ -30,7 +30,7 @@ public class UserService {
     }
 
     public Optional<User> authenticate(String username, String password) {
-        return userRepository.findByUsername(username)
+        return userRepository.findByUsernameAndActiveTrue(username)
                 .filter(user -> user.getPassword().equals(password));
     }
 }

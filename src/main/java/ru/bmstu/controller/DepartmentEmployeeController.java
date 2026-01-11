@@ -1,0 +1,80 @@
+package ru.bmstu.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.bmstu.service.DepartmentEmployeeService;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/department-employee")
+@CrossOrigin
+public class DepartmentEmployeeController {
+
+    private final DepartmentEmployeeService departmentEmployeeService;
+
+    public DepartmentEmployeeController(DepartmentEmployeeService departmentEmployeeService) {
+        this.departmentEmployeeService = departmentEmployeeService;
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<List<Map<String, Object>>> getDepartmentOrders(@RequestParam String username) {
+        try {
+            Map<String, Object> userInfo = departmentEmployeeService.getUserInfo(username);
+            Long departmentId = (Long) userInfo.get("department_id");
+
+            if (departmentId == null) {
+                return ResponseEntity.ok(List.of()); // Return empty list instead of error
+            }
+
+            return ResponseEntity.ok(departmentEmployeeService.getDepartmentOrders(departmentId));
+        } catch (Exception e) {
+            System.err.println("Error getting department orders: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.ok(List.of()); // Return empty list on error
+        }
+    }
+
+    @GetMapping("/documentation")
+    public ResponseEntity<List<Map<String, Object>>> getAvailableDocumentation(@RequestParam String username) {
+        try {
+            Map<String, Object> userInfo = departmentEmployeeService.getUserInfo(username);
+            Long departmentId = (Long) userInfo.get("department_id");
+
+            if (departmentId == null) {
+                return ResponseEntity.ok(List.of());
+            }
+
+            return ResponseEntity.ok(departmentEmployeeService.getAvailableDocumentation(departmentId));
+        } catch (Exception e) {
+            System.err.println("Error getting available documentation: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.ok(List.of());
+        }
+    }
+
+    @PostMapping("/documentation-request")
+    public ResponseEntity<?> createDocumentationRequest(@RequestParam String username,
+                                                       @RequestBody Map<String, Object> requestData) {
+        try {
+            Map<String, Object> userInfo = departmentEmployeeService.getUserInfo(username);
+            Long departmentId = (Long) userInfo.get("department_id");
+
+            if (departmentId == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "User not assigned to department"));
+            }
+
+            Long documentId = Long.valueOf(requestData.get("documentId").toString());
+            String requestReason = (String) requestData.get("reason");
+
+            departmentEmployeeService.createDocumentationRequest(departmentId, documentId, requestReason);
+            return ResponseEntity.ok(Map.of("message", "Documentation request submitted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+}
+
+
+

@@ -11,7 +11,7 @@ async function login() {
     }
 
     try {
-        const response = await fetch('http://localhost:8081/api/auth/login', {
+        const response = await fetch(window.location.origin + '/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -24,6 +24,15 @@ async function login() {
         }
 
         const data = await response.json();
+
+        // Save user data to localStorage for client pages
+        const userData = {
+            id: data.id,
+            username: data.username,
+            role: data.role
+        };
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+
         window.location.href = data.redirectUrl;
         messageDiv.style.color = 'green';
         messageDiv.textContent = `Привет, ${data.username}! Роль: ${data.role}`;
@@ -31,3 +40,4 @@ async function login() {
         messageDiv.textContent = 'Ошибка входа: Неверные данные';
     }
 }
+

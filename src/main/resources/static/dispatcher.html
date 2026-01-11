@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Диспетчер</title>
+    <link rel="stylesheet" href="css/role.css">
+</head>
+<body>
+    <div class="role-header">
+        <h1 class="role-title">Диспетчер</h1>
+        <button class="logout-btn" onclick="logout()">Выйти</button>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('orders')">Распределение заказов</button>
+                <button class="tab-button" onclick="switchTab('deptOrders')">Заказы отделений</button>
+                <button class="tab-button" onclick="switchTab('plans')">Производственные планы</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="welcome-section">
+                <p><strong>Добро пожаловать!</strong> Управляйте распределением заказов и просматривайте производственные планы</p>
+            </div>
+
+            <div id="ordersSection" class="tab-content active">
+                <h2>Заказы для распределения</h2>
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата создания</th>
+                            <th>Статус</th>
+                            <th>Клиент</th>
+                            <th>Содержание</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersBody">
+                        <tr>
+                            <td colspan="6" class="empty-message">Загрузка заказов...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="deptOrdersSection" class="tab-content">
+                <h2>Заказы отделений</h2>
+                <table id="deptOrdersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ID заказа</th>
+                            <th>Отдел</th>
+                            <th>Содержание</th>
+                            <th>Дата создания</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departmentOrdersBody">
+                        <tr>
+                            <td colspan="7" class="empty-message">Загрузка заказов отделений...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="plansSection" class="tab-content">
+                <h2>Производственные планы</h2>
+                <table id="plansTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата создания</th>
+                            <th>Последнее изменение</th>
+                            <th>Содержание</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plansBody">
+                        <tr>
+                            <td colspan="4" class="empty-message">Загрузка планов...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/dispatcher.js"></script>
+</body>
+</html>

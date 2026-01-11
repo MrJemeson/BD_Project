@@ -13,6 +13,7 @@ CREATE TABLE department_orders (
     creation_date DATE,
     status VARCHAR(50),
     last_modified DATE,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
     FOREIGN KEY (department_id) REFERENCES departments(id)
 );
 
@@ -21,7 +22,7 @@ CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
     creation_date DATE,
     status VARCHAR(50),
-    customer_id INT,
+    customer_id BIGINT NULL,
     order_content TEXT
 );
 
@@ -42,6 +43,20 @@ CREATE TABLE documentation_archive (
     content TEXT
 );
 
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(50) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    department_id BIGINT,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CONSTRAINT fk_users_department
+        FOREIGN KEY (department_id)
+        REFERENCES departments(id)
+        ON DELETE SET NULL
+);
+
 
 CREATE TABLE issued_copies (
     id SERIAL PRIMARY KEY,
@@ -52,25 +67,14 @@ CREATE TABLE issued_copies (
     FOREIGN KEY (department_id) REFERENCES departments(id)
 );
 
-
-CREATE OR REPLACE VIEW view_department_a AS
-SELECT d.document_id,
-       d.document_name,
-       d.document_type,
-       ic.issue_date,
-       ic.recipient_department_id
-FROM documents d
-JOIN issued_copies ic
-  ON d.document_id = ic.document_id
-WHERE ic.recipient_department_id = 'A';
-
-CREATE OR REPLACE VIEW view_department_b AS
-SELECT d.document_id,
-       d.document_name,
-       d.document_type,
-       ic.issue_date,
-       ic.recipient_department_id
-FROM documents d
-JOIN issued_copies ic
-  ON d.document_id = ic.document_id
-WHERE ic.recipient_department_id = 'B';
+CREATE TABLE documentation_requests (
+    id SERIAL PRIMARY KEY,
+    document_id INT NOT NULL,
+    department_id INT NOT NULL,
+    request_reason TEXT,
+    request_date DATE DEFAULT CURRENT_DATE,
+    status VARCHAR(50) DEFAULT 'Ожидает',
+    response_date DATE NULL,
+    FOREIGN KEY (document_id) REFERENCES documentation_archive(id),
+    FOREIGN KEY (department_id) REFERENCES departments(id)
+);
