@@ -5,6 +5,13 @@ const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionSto
 
 let currentTab = 'documents';
 
+const tabSectionIds = {
+    documents: 'documentsSection',
+    issued: 'issuedCopiesSection',
+    requests: 'requestsSection',
+    new: 'newDocumentSection'
+};
+
 function switchTab(tabName) {
     // Update active tab button
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -12,7 +19,13 @@ function switchTab(tabName) {
 
     // Update active tab content
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    document.getElementById(tabName + 'Section').classList.add('active');
+    const sectionId = tabSectionIds[tabName];
+    const section = sectionId ? document.getElementById(sectionId) : null;
+    if (!section) {
+        console.warn('Unknown tab section:', tabName);
+        return;
+    }
+    section.classList.add('active');
 
     currentTab = tabName;
 
@@ -510,4 +523,3 @@ async function init() {
 
 // Load initial data
 init();
-

@@ -71,3 +71,4 @@ Write-Host "  echo `$env:JAVA_HOME" -ForegroundColor White
 
 
 
+

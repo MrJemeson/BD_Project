@@ -17,6 +17,7 @@
             <div class="tabs">
                 <button class="tab-button active" onclick="switchTab('orders')">Заказы отдела</button>
                 <button class="tab-button" onclick="switchTab('documents')">Документация</button>
+                <button class="tab-button" onclick="switchTab('request')">Запрос документации</button>
             </div>
         </div>
 
@@ -69,6 +70,27 @@
                 </table>
             </div>
 
+            <div id="requestSection" class="tab-content">
+                <h2>Запрос документации</h2>
+                <form id="documentationRequestForm">
+                    <div class="form-container">
+                        <div>
+                            <label for="requestDocumentId">Документ</label>
+                            <select id="requestDocumentId" name="documentId" required>
+                                <option value="">Загрузка...</option>
+                            </select>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <label for="requestReason">Причина запроса</label>
+                            <textarea id="requestReason" name="requestReason" rows="4" placeholder="Опишите, зачем нужна документация" required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="save-btn" id="documentationRequestSubmit">Отправить запрос</button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 
@@ -76,4 +98,3 @@
     <script src="js/department-emp.js"></script>
 </body>
 </html>
-

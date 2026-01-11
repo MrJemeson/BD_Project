@@ -18,11 +18,26 @@ public class DepartmentEmployeeController {
         this.departmentEmployeeService = departmentEmployeeService;
     }
 
+    private Long extractDepartmentId(Map<String, Object> userInfo) {
+        Object value = userInfo.get("department_id");
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        try {
+            return Long.parseLong(value.toString());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     @GetMapping("/orders")
     public ResponseEntity<List<Map<String, Object>>> getDepartmentOrders(@RequestParam String username) {
         try {
             Map<String, Object> userInfo = departmentEmployeeService.getUserInfo(username);
-            Long departmentId = (Long) userInfo.get("department_id");
+            Long departmentId = extractDepartmentId(userInfo);
 
             if (departmentId == null) {
                 return ResponseEntity.ok(List.of()); // Return empty list instead of error
@@ -40,7 +55,7 @@ public class DepartmentEmployeeController {
     public ResponseEntity<List<Map<String, Object>>> getAvailableDocumentation(@RequestParam String username) {
         try {
             Map<String, Object> userInfo = departmentEmployeeService.getUserInfo(username);
-            Long departmentId = (Long) userInfo.get("department_id");
+            Long departmentId = extractDepartmentId(userInfo);
 
             if (departmentId == null) {
                 return ResponseEntity.ok(List.of());
@@ -54,12 +69,30 @@ public class DepartmentEmployeeController {
         }
     }
 
+    @GetMapping("/documentation-catalog")
+    public ResponseEntity<List<Map<String, Object>>> getDocumentationCatalog(@RequestParam String username) {
+        try {
+            Map<String, Object> userInfo = departmentEmployeeService.getUserInfo(username);
+            Long departmentId = extractDepartmentId(userInfo);
+
+            if (departmentId == null) {
+                return ResponseEntity.ok(List.of());
+            }
+
+            return ResponseEntity.ok(departmentEmployeeService.getDocumentationCatalog(departmentId));
+        } catch (Exception e) {
+            System.err.println("Error getting documentation catalog: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.ok(List.of());
+        }
+    }
+
     @PostMapping("/documentation-request")
     public ResponseEntity<?> createDocumentationRequest(@RequestParam String username,
                                                        @RequestBody Map<String, Object> requestData) {
         try {
             Map<String, Object> userInfo = departmentEmployeeService.getUserInfo(username);
-            Long departmentId = (Long) userInfo.get("department_id");
+            Long departmentId = extractDepartmentId(userInfo);
 
             if (departmentId == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "User not assigned to department"));
@@ -75,6 +108,4 @@ public class DepartmentEmployeeController {
         }
     }
 }
-
-
 

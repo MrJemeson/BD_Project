@@ -24,6 +24,9 @@ function switchTab(tabName) {
         case 'documents':
             loadAvailableDocumentation();
             break;
+        case 'request':
+            loadDocumentationCatalog();
+            break;
     }
 }
 
@@ -126,6 +129,81 @@ async function loadAvailableDocumentation() {
     }
 }
 
+function setRequestDocumentsState(message, disableActions) {
+    const select = document.getElementById('requestDocumentId');
+    const submitBtn = document.getElementById('documentationRequestSubmit');
+
+    if (!select || !submitBtn) return;
+
+    select.innerHTML = `<option value="">${message}</option>`;
+    select.disabled = disableActions;
+    submitBtn.disabled = disableActions;
+}
+
+function isTruthy(value) {
+    return value === true || value === 'true' || value === 1 || value === '1' || value === 't' || value === 'T';
+}
+
+async function loadDocumentationCatalog() {
+    if (!document.getElementById('requestSection').classList.contains('active')) return;
+
+    if (!currentUser.username) {
+        setRequestDocumentsState('Пользователь не найден. Пожалуйста, войдите в систему.', true);
+        return;
+    }
+
+    const select = document.getElementById('requestDocumentId');
+    const submitBtn = document.getElementById('documentationRequestSubmit');
+    select.innerHTML = '<option value="">Загрузка...</option>';
+    select.disabled = true;
+    submitBtn.disabled = true;
+
+    try {
+        const response = await fetch(`${API}/documentation-catalog?username=${encodeURIComponent(currentUser.username)}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const documents = await response.json();
+        select.innerHTML = '';
+
+        if (documents.length === 0) {
+            setRequestDocumentsState('Нет доступных документов', true);
+            return;
+        }
+
+        let hasAvailable = false;
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Выберите документ';
+        select.appendChild(placeholder);
+
+        documents.forEach(doc => {
+            const isIssuedToDepartment = isTruthy(doc.issued_to_department);
+            const option = document.createElement('option');
+            option.value = doc.id;
+            option.textContent = isIssuedToDepartment
+                ? `${doc.name} (ID ${doc.id}) — уже выдано вашему отделу`
+                : `${doc.name} (ID ${doc.id})`;
+            option.disabled = isIssuedToDepartment;
+            select.appendChild(option);
+            if (!isIssuedToDepartment) {
+                hasAvailable = true;
+            }
+        });
+
+        if (!hasAvailable) {
+            placeholder.textContent = 'Нет доступных документов для запроса';
+        }
+
+        select.disabled = false;
+        submitBtn.disabled = !hasAvailable;
+    } catch (error) {
+        console.error('Error loading documentation catalog:', error);
+        setRequestDocumentsState('Ошибка загрузки списка документов', true);
+    }
+}
+
 function getStatusClass(status) {
     switch (status) {
         case 'Новый': return 'status-new';
@@ -218,6 +296,54 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+document.getElementById('documentationRequestForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!currentUser.username) {
+        alert('Пользователь не найден. Пожалуйста, войдите в систему.');
+        return;
+    }
+
+    const formData = new FormData(e.target);
+    const documentId = parseInt(formData.get('documentId'), 10);
+    const reason = formData.get('requestReason').trim();
+
+    if (!documentId) {
+        alert('Выберите документ.');
+        return;
+    }
+
+    if (!reason) {
+        alert('Укажите причину запроса.');
+        return;
+    }
+
+    const requestData = {
+        documentId: documentId,
+        reason: reason
+    };
+
+    try {
+        const response = await fetch(`${API}/documentation-request?username=${encodeURIComponent(currentUser.username)}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(requestData)
+        });
+
+        if (response.ok) {
+            alert('Запрос на документацию отправлен!');
+            e.target.reset();
+            loadDocumentationCatalog();
+        } else {
+            const errorData = await response.json();
+            alert('Ошибка при отправке запроса: ' + (errorData.error || 'Неизвестная ошибка'));
+        }
+    } catch (error) {
+        console.error('Error requesting documentation:', error);
+        alert('Ошибка при отправке запроса: ' + error.message);
+    }
+});
+
 async function updateOrderStatus(orderId, currentStatus) {
     document.getElementById('statusOrderId').value = orderId;
     document.getElementById('currentStatus').value = currentStatus;
@@ -254,4 +380,3 @@ async function init() {
 
 // Load initial data
 init();
-

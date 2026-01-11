@@ -38,11 +38,25 @@ public class DepartmentEmployeeService {
             """, departmentId);
     }
 
+    // Получить каталог документов для запроса с отметкой выдачи текущему отделу
+    public List<Map<String, Object>> getDocumentationCatalog(Long departmentId) {
+        return jdbc.queryForList("""
+            SELECT da.id,
+                   da.name,
+                   EXISTS (
+                       SELECT 1 FROM issued_copies ic
+                       WHERE ic.document_id = da.id AND ic.department_id = ?
+                   ) AS issued_to_department
+            FROM documentation_archive da
+            ORDER BY da.name
+            """, departmentId);
+    }
+
     // Создать запрос на получение документации
     public void createDocumentationRequest(Long departmentId, Long documentId, String requestReason) {
         jdbc.update("""
-            INSERT INTO documentation_requests (document_id, department_id, request_reason, request_date, status)
-            VALUES (?, ?, ?, CURRENT_DATE, 'Ожидает')
+            INSERT INTO documentation_requests (document_id, department_id, request_reason)
+            VALUES (?, ?, ?)
             """, documentId, departmentId, requestReason);
     }
 
@@ -53,6 +67,3 @@ public class DepartmentEmployeeService {
             """, username);
     }
 }
-
-
-
