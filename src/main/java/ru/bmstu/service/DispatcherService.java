@@ -39,6 +39,14 @@ public class DispatcherService {
 
     // Добавить заказ подразделению
     public void createDepartmentOrder(Long orderId, Long departmentId, String content) {
+        String status = jdbc.queryForObject("""
+            SELECT status FROM orders WHERE id = ?
+            """, String.class, orderId);
+
+        if ("Отклонен".equals(status)) {
+            throw new IllegalStateException("Нельзя назначить заказ подразделению: заказ отклонен руководителем.");
+        }
+
         jdbc.update("""
             INSERT INTO department_orders (order_id, department_id, content, creation_date, status, last_modified)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -75,6 +83,9 @@ public class DispatcherService {
             """);
     }
 }
+
+
+
 
 
 

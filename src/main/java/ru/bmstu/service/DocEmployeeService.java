@@ -93,8 +93,15 @@ public class DocEmployeeService {
             SELECT document_id, department_id FROM documentation_requests WHERE id = ?
             """, requestId);
 
-        Long documentId = (Long) request.get("document_id");
-        Long departmentId = (Long) request.get("department_id");
+        Object documentIdValue = request.get("document_id");
+        Object departmentIdValue = request.get("department_id");
+
+        if (!(documentIdValue instanceof Number) || !(departmentIdValue instanceof Number)) {
+            throw new IllegalStateException("Некорректные идентификаторы документа или отдела.");
+        }
+
+        Long documentId = ((Number) documentIdValue).longValue();
+        Long departmentId = ((Number) departmentIdValue).longValue();
 
         // Выдать копию документа
         issueDocumentCopy(documentId, departmentId);
@@ -121,6 +128,5 @@ public class DocEmployeeService {
             """);
     }
 }
-
 
 

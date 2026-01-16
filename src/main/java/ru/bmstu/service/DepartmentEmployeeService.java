@@ -3,6 +3,7 @@ package ru.bmstu.service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -18,12 +19,12 @@ public class DepartmentEmployeeService {
     // Просмотр заказов своего подразделения
     public List<Map<String, Object>> getDepartmentOrders(Long departmentId) {
         return jdbc.queryForList("""
-            SELECT do.id, do.order_id, do.content, do.creation_date, do.status, do.last_modified,
+            SELECT dept_orders.id, dept_orders.order_id, dept_orders.content, dept_orders.creation_date, dept_orders.status, dept_orders.last_modified,
                    o.order_content as original_order_content
-            FROM department_orders do
-            JOIN orders o ON do.order_id = o.id
-            WHERE do.department_id = ?
-            ORDER BY do.creation_date DESC
+            FROM department_orders dept_orders
+            JOIN orders o ON dept_orders.order_id = o.id
+            WHERE dept_orders.department_id = ?
+            ORDER BY dept_orders.creation_date DESC
             """, departmentId);
     }
 
@@ -58,6 +59,14 @@ public class DepartmentEmployeeService {
             INSERT INTO documentation_requests (document_id, department_id, request_reason)
             VALUES (?, ?, ?)
             """, documentId, departmentId, requestReason);
+    }
+
+    public int updateDepartmentOrderStatus(Long departmentId, Long deptOrderId, String status) {
+        return jdbc.update("""
+            UPDATE department_orders
+            SET status = ?, last_modified = ?
+            WHERE id = ? AND department_id = ?
+            """, status, LocalDate.now(), deptOrderId, departmentId);
     }
 
     // Получить информацию о пользователе по username

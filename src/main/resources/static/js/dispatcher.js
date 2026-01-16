@@ -122,6 +122,11 @@ async function loadOrders() {
         orders.forEach(order => {
             const row = document.createElement('tr');
             const statusClass = getStatusClass(order.status);
+            const isRejected = order.status === 'Отклонен';
+            const assignAttrs = isRejected
+                ? 'disabled title="Заказ отклонен руководителем"'
+                : `onclick="createDepartmentOrder(${order.id})"`;
+
             row.innerHTML = `
                 <td>${order.id}</td>
                 <td>${formatDate(order.creation_date)}</td>
@@ -129,7 +134,7 @@ async function loadOrders() {
                 <td>${order.customer_name}</td>
                 <td>${order.order_content}</td>
                 <td>
-                    <button class="action-btn assign-btn" onclick="createDepartmentOrder(${order.id})">Назначить отделу</button>
+                    <button class="action-btn assign-btn" ${assignAttrs}>Назначить отделу</button>
                 </td>
             `;
             tbody.appendChild(row);
@@ -226,6 +231,7 @@ async function loadProductionPlans() {
 function getStatusClass(status) {
     switch (status) {
         case 'Принят': return 'status-approved';
+        case 'Отклонен': return 'status-rejected';
         case 'В процессе': return 'status-in-progress';
         case 'Завершен': return 'status-completed';
         default: return '';

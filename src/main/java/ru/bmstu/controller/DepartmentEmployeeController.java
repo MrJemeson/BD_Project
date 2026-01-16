@@ -6,6 +6,7 @@ import ru.bmstu.service.DepartmentEmployeeService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/department-employee")
@@ -107,5 +108,38 @@ public class DepartmentEmployeeController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
-}
 
+    @PutMapping("/orders/{deptOrderId}/status")
+    public ResponseEntity<?> updateDepartmentOrderStatus(@PathVariable Long deptOrderId,
+                                                         @RequestParam String username,
+                                                         @RequestBody Map<String, Object> statusData) {
+        try {
+            Map<String, Object> userInfo = departmentEmployeeService.getUserInfo(username);
+            Long departmentId = extractDepartmentId(userInfo);
+
+            if (departmentId == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "User not assigned to department"));
+            }
+
+            Object statusValue = statusData.get("status");
+            if (statusValue == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Status is required"));
+            }
+
+            String status = statusValue.toString();
+            Set<String> allowedStatuses = Set.of("Новый", "В процессе", "Завершен");
+            if (!allowedStatuses.contains(status)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Unsupported status"));
+            }
+
+            int updated = departmentEmployeeService.updateDepartmentOrderStatus(departmentId, deptOrderId, status);
+            if (updated == 0) {
+                return ResponseEntity.status(404).body(Map.of("error", "Order not found for department"));
+            }
+
+            return ResponseEntity.ok(Map.of("message", "Order status updated successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+}

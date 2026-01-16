@@ -1,8 +1,13 @@
 package ru.bmstu.controller;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,33 +46,46 @@ public class AdminController {
     }
 
     @PostMapping("/table/{name}")
-    public void insert(@PathVariable String name,
-                       @RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> insert(@PathVariable String name,
+                                    @RequestBody Map<String, Object> body) {
+        try {
+            Map<String, Object> filtered = normalizeValues(name, body, true);
 
-        String columns = String.join(",", body.keySet());
-        String values = body.keySet().stream()
-                .map(k -> "?")
-                .reduce((a, b) -> a + "," + b).orElse("");
+            if (filtered.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "No values provided"));
+            }
 
-        jdbc.update(
-                "INSERT INTO " + name + " (" + columns + ") VALUES (" + values + ")",
-                body.values().toArray()
-        );
+            String columns = String.join(",", filtered.keySet());
+            String values = filtered.keySet().stream()
+                    .map(k -> "?")
+                    .reduce((a, b) -> a + "," + b).orElse("");
+
+            jdbc.update(
+                    "INSERT INTO " + name + " (" + columns + ") VALUES (" + values + ")",
+                    filtered.values().toArray()
+            );
+            return ResponseEntity.ok(Map.of("message", "Row created"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", extractRootMessage(e)));
+        }
     }
 
     @PutMapping("/table/{name}")
     public void update(@PathVariable String name,
-                       @RequestParam String idColumn,
-                       @RequestParam Object idValue,
+                       @RequestParam("idColumn") String idColumn,
+                       @RequestParam("idValue") String idValue,
                        @RequestBody Map<String, Object> body) {
 
-        String setClause = body.keySet().stream()
+        Map<String, Object> normalized = normalizeValues(name, body, false);
+        normalized.remove(idColumn);
+
+        String setClause = normalized.keySet().stream()
                 .map(k -> k + " = ?")
                 .reduce((a, b) -> a + ", " + b).orElse("");
 
-        Object[] values = new Object[body.size() + 1];
-        System.arraycopy(body.values().toArray(), 0, values, 0, body.size());
-        values[body.size()] = idValue;
+        Object[] values = new Object[normalized.size() + 1];
+        System.arraycopy(normalized.values().toArray(), 0, values, 0, normalized.size());
+        values[normalized.size()] = parseIdValue(idValue);
 
         jdbc.update(
                 "UPDATE " + name + " SET " + setClause + " WHERE " + idColumn + " = ?",
@@ -77,10 +95,103 @@ public class AdminController {
 
     @DeleteMapping("/table/{name}")
     public void delete(@PathVariable String name,
-                       @RequestParam String idColumn,
-                       @RequestParam Object idValue) {
+                       @RequestParam("idColumn") String idColumn,
+                       @RequestParam("idValue") String idValue) {
 
-        jdbc.update("DELETE FROM " + name + " WHERE " + idColumn + " = ?", idValue);
+        jdbc.update("DELETE FROM " + name + " WHERE " + idColumn + " = ?", parseIdValue(idValue));
+    }
+
+    private Object parseIdValue(String idValue) {
+        if (idValue == null) {
+            return null;
+        }
+        try {
+            return Long.valueOf(idValue);
+        } catch (NumberFormatException ex) {
+            return idValue;
+        }
+    }
+
+    private Map<String, Object> normalizeValues(String tableName, Map<String, Object> input, boolean filterNulls) {
+        Map<String, String> columnTypes = getColumnTypes(tableName);
+        Map<String, Object> normalized = new LinkedHashMap<>();
+
+        input.forEach((key, value) -> {
+            Object converted = convertValue(columnTypes.get(key), value);
+            if (filterNulls) {
+                if (converted != null) {
+                    normalized.put(key, converted);
+                }
+            } else {
+                normalized.put(key, converted);
+            }
+        });
+
+        return normalized;
+    }
+
+    private Map<String, String> getColumnTypes(String tableName) {
+        List<Map<String, Object>> rows = jdbc.queryForList("""
+            SELECT column_name, data_type
+            FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = ?
+            """, tableName);
+
+        Map<String, String> result = new java.util.HashMap<>();
+        for (Map<String, Object> row : rows) {
+            Object column = row.get("column_name");
+            Object type = row.get("data_type");
+            if (column != null && type != null) {
+                result.put(column.toString(), type.toString());
+            }
+        }
+        return result;
+    }
+
+    private Object convertValue(String dataType, Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (!(value instanceof String text)) {
+            return value;
+        }
+
+        String trimmed = text.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+
+        if (dataType == null) {
+            return trimmed;
+        }
+
+        return switch (dataType) {
+            case "integer", "smallint", "bigint" -> Long.valueOf(trimmed);
+            case "numeric", "real", "double precision" -> new BigDecimal(trimmed);
+            case "boolean" -> parseBoolean(trimmed);
+            case "date" -> LocalDate.parse(trimmed);
+            case "timestamp without time zone", "timestamp with time zone" -> LocalDateTime.parse(trimmed);
+            default -> trimmed;
+        };
+    }
+
+    private Boolean parseBoolean(String value) {
+        String normalized = value.toLowerCase();
+        if (normalized.equals("true") || normalized.equals("t") || normalized.equals("1")) {
+            return Boolean.TRUE;
+        }
+        if (normalized.equals("false") || normalized.equals("f") || normalized.equals("0")) {
+            return Boolean.FALSE;
+        }
+        return null;
+    }
+
+    private String extractRootMessage(Throwable error) {
+        Throwable root = error;
+        while (root.getCause() != null && root.getCause() != root) {
+            root = root.getCause();
+        }
+        return root.getMessage() == null ? error.getMessage() : root.getMessage();
     }
 
     // Specific endpoints for admin panel

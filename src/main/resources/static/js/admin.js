@@ -8,6 +8,23 @@ let genericColumns = [];
 let editingGenericRow = null;
 let pendingTableSelection = '';
 
+async function readErrorMessage(response) {
+    try {
+        const data = await response.json();
+        if (data && data.error) {
+            return data.error;
+        }
+        return JSON.stringify(data);
+    } catch (error) {
+        try {
+            const text = await response.text();
+            return text || `HTTP error! status: ${response.status}`;
+        } catch (innerError) {
+            return `HTTP error! status: ${response.status}`;
+        }
+    }
+}
+
 function switchTab(tabName) {
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     const activeButton = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
@@ -230,7 +247,8 @@ async function saveGenericRow() {
                 body: JSON.stringify(obj)
             });
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorMessage = await readErrorMessage(response);
+                throw new Error(errorMessage);
             }
             editingGenericRow = null;
         } else {
@@ -240,7 +258,8 @@ async function saveGenericRow() {
                 body: JSON.stringify(obj)
             });
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorMessage = await readErrorMessage(response);
+                throw new Error(errorMessage);
             }
         }
 
