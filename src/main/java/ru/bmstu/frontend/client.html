@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Клиентская панель</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1>Панель клиента</h1>
+    <p>Добро пожаловать! Здесь вы можете:</p>
+    <ul>
+        <li>Просматривать свои заказы</li>
+        <li>Создавать новые заказы</li>
+        <li>Отслеживать статус заказов</li>
+    </ul>
+
+    <div id="ordersSection">
+        <h2>Мои заказы</h2>
+        <table id="ordersTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Дата создания</th>
+                    <th>Статус</th>
+                    <th>Содержание</th>
+                </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+        </table>
+    </div>
+
+    <div id="newOrderSection">
+        <h2>Создать новый заказ</h2>
+        <form id="newOrderForm">
+            <label for="orderContent">Описание заказа:</label><br>
+            <textarea id="orderContent" name="orderContent" rows="4" cols="50"></textarea><br><br>
+            <button type="submit">Создать заказ</button>
+        </form>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/client.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+

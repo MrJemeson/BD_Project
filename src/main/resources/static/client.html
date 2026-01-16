@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клиент</title>
+    <link rel="stylesheet" href="css/role.css">
+</head>
+<body>
+    <div class="role-header">
+        <h1 class="role-title">Клиент</h1>
+        <button class="logout-btn" onclick="logout()">Выйти</button>
+    </div>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('orders')">Мои заказы</button>
+                <button class="tab-button" onclick="switchTab('new')">Новый заказ</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="welcome-section">
+                <p><strong>Добро пожаловать!</strong> Здесь вы можете просматривать свои заказы и создавать новые</p>
+            </div>
+
+            <div id="ordersSection" class="tab-content active">
+                <h2>Мои заказы</h2>
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата создания</th>
+                            <th>Статус</th>
+                            <th>Содержание</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersBody">
+                        <tr>
+                            <td colspan="4" class="empty-message">Загрузка заказов...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="newSection" class="tab-content">
+                <h2>Создать новый заказ</h2>
+                <form id="newOrderForm">
+                    <label for="orderContent">Описание заказа:</label>
+                    <textarea id="orderContent" name="orderContent" placeholder="Опишите ваш заказ подробно..." required></textarea>
+                    <div class="form-buttons">
+                        <button type="submit">Создать заказ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/client.js"></script>
+</body>
+</html>
+
