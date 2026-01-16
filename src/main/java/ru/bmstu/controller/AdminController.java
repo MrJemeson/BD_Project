@@ -194,7 +194,6 @@ public class AdminController {
         return root.getMessage() == null ? error.getMessage() : root.getMessage();
     }
 
-    // Specific endpoints for admin panel
     @GetMapping("/users")
     public List<Map<String, Object>> getUsers() {
         return jdbc.queryForList("SELECT id, username, role FROM users ORDER BY username");

@@ -1,6 +1,5 @@
 const API = 'http://localhost:8081/api/doc-employee';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
 async function loadDocuments() {
@@ -134,7 +133,6 @@ async function deleteDocument(docId) {
 }
 
 async function issueCopy(docId) {
-    // Load departments for selection
     const deptResponse = await fetch(`${API}/departments`);
     const departments = await deptResponse.json();
 
@@ -181,6 +179,5 @@ async function revokeCopy(copyId) {
     }
 }
 
-// Load data on page load
 loadDocuments();
 loadIssuedCopies();

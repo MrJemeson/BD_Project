@@ -16,7 +16,6 @@ public class ManagerService {
         this.jdbc = jdbc;
     }
 
-    // Просмотр активных заказов
     public List<Map<String, Object>> getActiveOrders() {
         return jdbc.queryForList("""
             SELECT o.id, o.creation_date, o.status, o.order_content, u.username as customer_name
@@ -27,7 +26,6 @@ public class ManagerService {
             """);
     }
 
-    // Просмотр всех заказов (журнал)
     public List<Map<String, Object>> getAllOrders() {
         return jdbc.queryForList("""
             SELECT o.id, o.creation_date, o.status, o.order_content, u.username as customer_name
@@ -37,28 +35,24 @@ public class ManagerService {
             """);
     }
 
-    // Принять заказ
     public void approveOrder(Long orderId) {
         jdbc.update("""
             UPDATE orders SET status = 'Принят' WHERE id = ?
             """, orderId);
     }
 
-    // Отклонить заказ
     public void rejectOrder(Long orderId) {
         jdbc.update("""
             UPDATE orders SET status = 'Отклонен' WHERE id = ?
             """, orderId);
     }
 
-    // Завершить заказ
     public void completeOrder(Long orderId) {
         jdbc.update("""
             UPDATE orders SET status = 'Завершен' WHERE id = ?
             """, orderId);
     }
 
-    // Просмотр планов производства
     public List<Map<String, Object>> getProductionPlans() {
         return jdbc.queryForList("""
             SELECT id, creation_date, last_modified, content
@@ -67,7 +61,6 @@ public class ManagerService {
             """);
     }
 
-    // Добавить план производства
     public void createProductionPlan(String content) {
         jdbc.update("""
             INSERT INTO production_plans_archive (creation_date, last_modified, content)
@@ -75,14 +68,12 @@ public class ManagerService {
             """, LocalDate.now(), LocalDate.now(), content);
     }
 
-    // Обновить план производства
     public void updateProductionPlan(Long planId, String content) {
         jdbc.update("""
             UPDATE production_plans_archive SET content = ?, last_modified = ? WHERE id = ?
             """, content, LocalDate.now(), planId);
     }
 
-    // Удалить план производства
     public void deleteProductionPlan(Long planId) {
         jdbc.update("""
             DELETE FROM production_plans_archive WHERE id = ?

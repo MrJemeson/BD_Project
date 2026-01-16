@@ -1,22 +1,18 @@
 const API = window.location.origin + '/api/department-employee';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || '{}');
 
 let currentTab = 'orders';
 
 function switchTab(tabName) {
-    // Update active tab button
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
 
-    // Update active tab content
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     document.getElementById(tabName + 'Section').classList.add('active');
 
     currentTab = tabName;
 
-    // Load data for the selected tab
     switch (tabName) {
         case 'orders':
             loadDepartmentOrders();
@@ -225,9 +221,7 @@ function showError(elementId, message) {
     tbody.innerHTML = `<tr><td colspan="${colspan}" class="empty-message" style="color: red;">${message}</td></tr>`;
 }
 
-// Form handling for updating order status
 document.addEventListener('DOMContentLoaded', function() {
-    // Add form for updating order status
     const ordersSection = document.getElementById('ordersSection');
     const formHTML = `
         <div class="form-section" id="updateStatusForm" style="display: none;">
@@ -260,7 +254,6 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     ordersSection.insertAdjacentHTML('beforeend', formHTML);
 
-    // Handle form submission
     document.getElementById('changeStatusForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -366,7 +359,6 @@ function logout() {
     }
 }
 
-// Initialize the page
 async function init() {
     if (!currentUser.username) {
         alert('Пользователь не найден. Пожалуйста, войдите в систему.');
@@ -374,9 +366,7 @@ async function init() {
         return;
     }
 
-    // Load initial data
     loadDepartmentOrders();
 }
 
-// Load initial data
 init();

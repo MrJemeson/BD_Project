@@ -16,7 +16,6 @@ public class DispatcherService {
         this.jdbc = jdbc;
     }
 
-    // Просмотр всех заказов
     public List<Map<String, Object>> getAllOrders() {
         return jdbc.queryForList("""
             SELECT o.id, o.creation_date, o.status, o.order_content, u.username as customer_name
@@ -26,7 +25,6 @@ public class DispatcherService {
             """);
     }
 
-    // Просмотр заказов подразделений
     public List<Map<String, Object>> getDepartmentOrders() {
         return jdbc.queryForList("""
             SELECT dept_orders.id, dept_orders.order_id, dept_orders.department_id, dept_orders.content, dept_orders.creation_date,
@@ -37,7 +35,6 @@ public class DispatcherService {
             """);
     }
 
-    // Добавить заказ подразделению
     public void createDepartmentOrder(Long orderId, Long departmentId, String content) {
         String status = jdbc.queryForObject("""
             SELECT status FROM orders WHERE id = ?
@@ -53,21 +50,18 @@ public class DispatcherService {
             """, orderId, departmentId, content, LocalDate.now(), "Новый", LocalDate.now());
     }
 
-    // Обновить заказ подразделению
     public void updateDepartmentOrder(Long deptOrderId, String content, String status) {
         jdbc.update("""
             UPDATE department_orders SET content = ?, status = ?, last_modified = ? WHERE id = ?
             """, content, status, LocalDate.now(), deptOrderId);
     }
 
-    // Удалить заказ подразделению
     public void deleteDepartmentOrder(Long deptOrderId) {
         jdbc.update("""
             DELETE FROM department_orders WHERE id = ?
             """, deptOrderId);
     }
 
-    // Просмотр планов производства
     public List<Map<String, Object>> getProductionPlans() {
         return jdbc.queryForList("""
             SELECT id, creation_date, last_modified, content
@@ -76,7 +70,6 @@ public class DispatcherService {
             """);
     }
 
-    // Получить список отделов
     public List<Map<String, Object>> getDepartments() {
         return jdbc.queryForList("""
             SELECT id, name, type FROM departments

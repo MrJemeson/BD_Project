@@ -25,7 +25,6 @@ async function login() {
 
         const data = await response.json();
 
-        // Save user data to localStorage for client pages
         const userData = {
             id: data.id,
             username: data.username,

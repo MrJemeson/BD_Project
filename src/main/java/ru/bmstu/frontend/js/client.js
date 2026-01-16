@@ -1,6 +1,5 @@
 const API = 'http://localhost:8081/api/client';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
 async function loadOrders() {
@@ -53,5 +52,4 @@ document.getElementById('newOrderForm').addEventListener('submit', async (e) => 
     }
 });
 
-// Load orders on page load
 loadOrders();

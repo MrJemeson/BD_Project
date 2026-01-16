@@ -39,7 +39,6 @@ public class ClientService {
             throw new IllegalArgumentException("Содержание заказа не может быть пустым");
         }
 
-        // Get user id by username
         Long userId = jdbc.queryForObject("""
             SELECT id FROM users WHERE username = ? AND active = true
             """, Long.class, username);

@@ -1,6 +1,5 @@
 const API = 'http://localhost:8081/api/manager';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
 async function loadActiveOrders() {
@@ -184,7 +183,6 @@ async function deletePlan(planId) {
     }
 }
 
-// Load data on page load
 loadActiveOrders();
 loadAllOrders();
 loadProductionPlans();

@@ -1,6 +1,5 @@
 const API = window.location.origin + '/api/doc-employee';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || '{}');
 
 let currentTab = 'documents';
@@ -13,11 +12,9 @@ const tabSectionIds = {
 };
 
 function switchTab(tabName) {
-    // Update active tab button
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
 
-    // Update active tab content
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     const sectionId = tabSectionIds[tabName];
     const section = sectionId ? document.getElementById(sectionId) : null;
@@ -29,7 +26,6 @@ function switchTab(tabName) {
 
     currentTab = tabName;
 
-    // Load data for the selected tab
     switch (tabName) {
         case 'documents':
             loadDocuments();
@@ -41,7 +37,6 @@ function switchTab(tabName) {
             loadDocumentationRequests();
             break;
         case 'new':
-            // No data loading needed for new document form
             break;
     }
 }
@@ -287,9 +282,7 @@ document.getElementById('newDocumentForm').addEventListener('submit', async (e) 
     }
 });
 
-// Form handling for editing documents
 document.addEventListener('DOMContentLoaded', function() {
-    // Add form for editing documents
     const documentsSection = document.getElementById('documentsSection');
     const formHTML = `
         <div class="form-section" id="editDocumentForm" style="display: none;">
@@ -314,7 +307,6 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     documentsSection.insertAdjacentHTML('beforeend', formHTML);
 
-    // Handle form submission
     document.getElementById('updateDocumentForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -381,9 +373,7 @@ async function deleteDocument(docId) {
     }
 }
 
-// Form handling for issuing copies
 document.addEventListener('DOMContentLoaded', function() {
-    // Add form for issuing copies
     const documentsSection = document.getElementById('documentsSection');
     const formHTML = `
         <div class="form-section" id="issueCopyForm" style="display: none;">
@@ -408,7 +398,6 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     documentsSection.insertAdjacentHTML('beforeend', formHTML);
 
-    // Handle form submission
     document.getElementById('createIssueCopyForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -442,7 +431,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function issueCopy(docId) {
     try {
-        // Load departments for selection
         const deptResponse = await fetch(`${API}/departments`);
         if (!deptResponse.ok) {
             throw new Error('Не удалось загрузить список отделов');
@@ -455,7 +443,6 @@ async function issueCopy(docId) {
             return;
         }
 
-        // Populate department dropdown
         const deptSelect = document.getElementById('issueDepartmentId');
         deptSelect.innerHTML = '<option value="">Выберите отдел...</option>';
         departments.forEach(dept => {
@@ -465,7 +452,6 @@ async function issueCopy(docId) {
             deptSelect.appendChild(option);
         });
 
-        // Show form
         document.getElementById('issueDocId').value = docId;
         document.getElementById('issueCopyForm').style.display = 'block';
 
@@ -509,7 +495,6 @@ function logout() {
     }
 }
 
-// Initialize the page
 async function init() {
     if (!currentUser.username) {
         alert('Пользователь не найден. Пожалуйста, войдите в систему.');
@@ -517,9 +502,7 @@ async function init() {
         return;
     }
 
-    // Load initial data
     loadDocuments();
 }
 
-// Load initial data
 init();

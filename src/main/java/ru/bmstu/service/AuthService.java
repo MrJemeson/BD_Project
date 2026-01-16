@@ -1,6 +1,5 @@
 package ru.bmstu.service;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.bmstu.model.User;
 import ru.bmstu.repository.UserRepository;
@@ -9,7 +8,6 @@ import ru.bmstu.repository.UserRepository;
 public class AuthService {
 
     private final UserRepository userRepository;
-//    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -23,10 +21,6 @@ public class AuthService {
         if (password.equals(user.getPassword())) {
             throw new RuntimeException("Bad credentials");
         }
-//        if (!encoder.matches(password, user.getPassword())) {
-//            throw new RuntimeException("Bad credentials");
-//        }
-
         return user;
     }
 

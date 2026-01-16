@@ -1,19 +1,15 @@
 const API = window.location.origin + '/api/manager';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || '{}');
 
 let currentTab = 'active';
 
 function switchTab(tabName) {
-    // Update active tab button
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
 
-    // Update active tab content
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-    // Handle different section IDs
     let sectionId;
     switch (tabName) {
         case 'active':
@@ -32,7 +28,6 @@ function switchTab(tabName) {
 
     currentTab = tabName;
 
-    // Load data for the selected tab
     switch (tabName) {
         case 'active':
             loadActiveOrders();
@@ -299,9 +294,7 @@ document.getElementById('newPlanForm').addEventListener('submit', async (e) => {
     }
 });
 
-// Form handling for editing plans
 document.addEventListener('DOMContentLoaded', function() {
-    // Add form for editing plans
     const plansSection = document.getElementById('plansSection');
     const formHTML = `
         <div class="form-section" id="editPlanForm" style="display: none;">
@@ -322,7 +315,6 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     plansSection.insertAdjacentHTML('beforeend', formHTML);
 
-    // Handle form submission
     document.getElementById('updatePlanForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -395,7 +387,6 @@ function logout() {
     }
 }
 
-// Initialize the page
 async function init() {
     if (!currentUser.username) {
         alert('Пользователь не найден. Пожалуйста, войдите в систему.');
@@ -403,10 +394,8 @@ async function init() {
         return;
     }
 
-    // Load initial data
     loadActiveOrders();
 }
 
-// Load initial data
 init();
 

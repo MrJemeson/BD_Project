@@ -18,20 +18,18 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admin/**").permitAll() // Временно разрешено для тестирования
-                        .requestMatchers("/api/client/**").permitAll() // Разрешено для клиентов
-                        .requestMatchers("/api/manager/**").permitAll() // Разрешено для менеджеров
-                        .requestMatchers("/api/dispatcher/**").permitAll() // Разрешено для диспетчеров
-                        .requestMatchers("/api/department-employee/**").permitAll() // Разрешено для сотрудников отдела
-                        .requestMatchers("/api/doc-employee/**").permitAll() // Разрешено для сотрудников по документации
+                        .requestMatchers("/api/admin/**").permitAll()
+                        .requestMatchers("/api/client/**").permitAll()
+                        .requestMatchers("/api/manager/**").permitAll()
+                        .requestMatchers("/api/dispatcher/**").permitAll()
+                        .requestMatchers("/api/department-employee/**").permitAll()
+                        .requestMatchers("/api/doc-employee/**").permitAll()
                         .anyRequest().permitAll()
                 )
 
-                // отключаем стандартные способы логина
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
 
-                // включаем сессии для поддержания аутентификации
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED)
                 );

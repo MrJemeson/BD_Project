@@ -1,6 +1,5 @@
 const API = window.location.origin + '/api/admin';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || '{}');
 
 let currentGenericTable = '';

@@ -47,7 +47,6 @@ public class AuthController {
     }
 
     private String resolveRedirectByRole(String role) {
-        // Remove ROLE_ prefix if present
         String cleanRole = role.startsWith("ROLE_") ? role.substring(5) : role;
         return switch (cleanRole) {
             case "CLIENT" -> "client.html";

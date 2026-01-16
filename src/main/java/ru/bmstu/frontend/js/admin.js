@@ -83,7 +83,6 @@ function renderTable(data) {
             tr.appendChild(td);
         });
 
-        // Actions column
         const actionsTd = document.createElement('td');
         const editBtn = document.createElement('button');
         editBtn.textContent = 'Редактировать';
@@ -126,8 +125,7 @@ async function saveRow() {
         });
 
         if (editingRow) {
-            // Update existing row
-            const idColumn = columns[0]; // Assume first column is ID
+            const idColumn = columns[0];
             const idValue = editingRow[idColumn];
             const res = await fetch(`${API}/table/${currentTable}?idColumn=${idColumn}&idValue=${idValue}`, {
                 method: 'PUT',
@@ -139,7 +137,6 @@ async function saveRow() {
             }
             editingRow = null;
         } else {
-            // Insert new row
             const res = await fetch(`${API}/table/${currentTable}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -151,7 +148,7 @@ async function saveRow() {
         }
 
         loadTable();
-        renderForm(); // Reset form
+        renderForm();
         alert('Запись успешно сохранена');
     } catch (error) {
         console.error('Error saving row:', error);
@@ -175,7 +172,7 @@ async function deleteRow(row) {
     try {
         if (!confirm('Вы уверены, что хотите удалить эту запись?')) return;
 
-        const idColumn = columns[0]; // Assume first column is ID
+        const idColumn = columns[0];
         const idValue = row[idColumn];
         const res = await fetch(`${API}/table/${currentTable}?idColumn=${idColumn}&idValue=${idValue}`, {
             method: 'DELETE'
@@ -192,7 +189,6 @@ async function deleteRow(row) {
     }
 }
 
-// Initialize the page
 async function init() {
     await loadTables();
     renderForm();

@@ -1,6 +1,5 @@
 const API = window.location.origin + '/api/dispatcher';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || '{}');
 
 let currentTab = 'orders';
@@ -8,18 +7,15 @@ let currentTab = 'orders';
 function switchTab(tabName) {
     console.log('Switching to tab:', tabName);
 
-    // Update active tab button
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
 
-    // Update active tab content
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     document.getElementById(tabName + 'Section').classList.add('active');
 
     currentTab = tabName;
     console.log('Tab switched to:', tabName);
 
-    // Load data for the selected tab
     switch (tabName) {
         case 'orders':
             console.log('Loading orders...');
@@ -36,9 +32,7 @@ function switchTab(tabName) {
     }
 }
 
-// Form handling for creating department orders
 document.addEventListener('DOMContentLoaded', function() {
-    // Add form for creating department orders
     const ordersSection = document.getElementById('ordersSection');
     const formHTML = `
         <div class="form-section" id="deptOrderForm" style="display: none;">
@@ -67,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     ordersSection.insertAdjacentHTML('beforeend', formHTML);
 
-    // Handle form submission
     document.getElementById('createDeptOrderForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -265,7 +258,6 @@ async function createDepartmentOrder(orderId) {
             return;
         }
 
-        // Populate department dropdown
         const deptSelect = document.getElementById('departmentId');
         deptSelect.innerHTML = '<option value="">Выберите отдел...</option>';
         departments.forEach(dept => {
@@ -275,7 +267,6 @@ async function createDepartmentOrder(orderId) {
             deptSelect.appendChild(option);
         });
 
-        // Show form
         document.getElementById('orderId').value = orderId;
         document.getElementById('deptOrderForm').style.display = 'block';
         document.getElementById('deptOrderFormTitle').textContent = 'Назначить заказ отделу';
@@ -291,9 +282,7 @@ function hideDeptOrderForm() {
     document.getElementById('createDeptOrderForm').reset();
 }
 
-// Form handling for editing department orders
 document.addEventListener('DOMContentLoaded', function() {
-    // Add form for editing department orders
     const deptOrdersSection = document.getElementById('deptOrdersSection');
     const formHTML = `
         <div class="form-section" id="editDeptOrderForm" style="display: none;">
@@ -322,7 +311,6 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     deptOrdersSection.insertAdjacentHTML('beforeend', formHTML);
 
-    // Handle form submission
     document.getElementById('updateDeptOrderForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -397,7 +385,6 @@ function logout() {
     }
 }
 
-// Initialize the page
 async function init() {
     if (!currentUser.username) {
         alert('Пользователь не найден. Пожалуйста, войдите в систему.');
@@ -405,9 +392,7 @@ async function init() {
         return;
     }
 
-    // Load initial data
     loadOrders();
 }
 
-// Load initial data
 init();

@@ -1,6 +1,5 @@
 const API = 'http://localhost:8081/api/dispatcher';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
 async function loadOrders() {
@@ -83,7 +82,6 @@ async function loadProductionPlans() {
 }
 
 async function createDepartmentOrder(orderId) {
-    // Load departments for selection
     const deptResponse = await fetch(`${API}/departments`);
     const departments = await deptResponse.json();
 
@@ -164,7 +162,6 @@ async function deleteDepartmentOrder(deptOrderId) {
     }
 }
 
-// Load data on page load
 loadOrders();
 loadDepartmentOrders();
 loadProductionPlans();

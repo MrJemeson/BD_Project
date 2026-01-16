@@ -1,6 +1,5 @@
 const API = 'http://localhost:8081/api/department-employee';
 
-// Load user info from session/localStorage
 const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
 async function loadDepartmentOrders() {
@@ -81,6 +80,5 @@ document.getElementById('documentationRequestForm').addEventListener('submit', a
     }
 });
 
-// Load data on page load
 loadDepartmentOrders();
 loadAvailableDocumentation();

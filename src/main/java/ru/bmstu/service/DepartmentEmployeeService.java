@@ -16,7 +16,6 @@ public class DepartmentEmployeeService {
         this.jdbc = jdbc;
     }
 
-    // Просмотр заказов своего подразделения
     public List<Map<String, Object>> getDepartmentOrders(Long departmentId) {
         return jdbc.queryForList("""
             SELECT dept_orders.id, dept_orders.order_id, dept_orders.content, dept_orders.creation_date, dept_orders.status, dept_orders.last_modified,
@@ -28,7 +27,6 @@ public class DepartmentEmployeeService {
             """, departmentId);
     }
 
-    // Просмотр документации доступной отделу (выданные копии)
     public List<Map<String, Object>> getAvailableDocumentation(Long departmentId) {
         return jdbc.queryForList("""
             SELECT da.id, da.name, da.creation_date, da.last_modified, da.content, ic.issue_date
@@ -39,7 +37,6 @@ public class DepartmentEmployeeService {
             """, departmentId);
     }
 
-    // Получить каталог документов для запроса с отметкой выдачи текущему отделу
     public List<Map<String, Object>> getDocumentationCatalog(Long departmentId) {
         return jdbc.queryForList("""
             SELECT da.id,
@@ -53,7 +50,6 @@ public class DepartmentEmployeeService {
             """, departmentId);
     }
 
-    // Создать запрос на получение документации
     public void createDocumentationRequest(Long departmentId, Long documentId, String requestReason) {
         jdbc.update("""
             INSERT INTO documentation_requests (document_id, department_id, request_reason)
@@ -69,7 +65,6 @@ public class DepartmentEmployeeService {
             """, status, LocalDate.now(), deptOrderId, departmentId);
     }
 
-    // Получить информацию о пользователе по username
     public Map<String, Object> getUserInfo(String username) {
         return jdbc.queryForMap("""
             SELECT id, username, department_id FROM users WHERE username = ?
